@@ -13,6 +13,7 @@ import static java.util.Collections.singletonMap;
  */
 public class DocTest {
     public static void main(String[] args) {
+        // tag::minimum-viable-snippet[]
         Driver driver = GraphDatabase.driver("bolt://localhost");
         String query = "MATCH (:Movie {title:{title}})<-[:ACTED_IN]-(a:Person) RETURN a.name as actor";
 
@@ -23,5 +24,6 @@ public class DocTest {
                 System.out.println(result.next().get("actor"));
             }
         }
+        // end::minimum-viable-snippet[]
     }
 }
