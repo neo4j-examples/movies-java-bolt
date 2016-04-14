@@ -1,5 +1,7 @@
 == Neo4j Movies Example Application
 
+image::http://dev.assets.neo4j.com.s3.amazonaws.com/wp-content/uploads/movie_application.png[float=right,width=400]
+
 This example application demonstrates how easy it is to get started with http://neo4j.com/developer[Neo4j] in Java.
 
 It is a very simple web application that uses our Movie graph dataset to provide a search with listing, a detail view and a graph visualization.
@@ -7,7 +9,7 @@ It is a very simple web application that uses our Movie graph dataset to provide
 THe front-end is just jQuery and d3 and the backend is implemented in Java using spark-java a lightweight web framework.
 
 Using Neo4j from Java is as easy as using any other database that offers a textual query language.
-With our binary protocol driver for the binary protocol, you get a clean API to manage your `Session`, `Transaction` and `Statement` and iterate over the `Value`s of a `StatementResult` with a rich conversion DSL.
+With our binary protocol driver for the binary protocol, you get a clean API to manage your `Session`, `Transaction` and `Statement` and iterate over each `Value` of a `StatementResult` with a rich conversion DSL.
 
 === The Stack
 
