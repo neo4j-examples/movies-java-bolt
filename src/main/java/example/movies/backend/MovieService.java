@@ -2,7 +2,7 @@ package example.movies.backend;
 
 import example.movies.executor.CypherExecutor;
 import example.movies.executor.BoltCypherExecutor;
-import org.neo4j.helpers.collection.IteratorUtil;
+import org.neo4j.helpers.collection.Iterators;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,7 +37,7 @@ public class MovieService {
 
     public Map findMovie(String title) {
         if (title==null) return Collections.emptyMap();
-        return IteratorUtil.singleOrNull(cypher.query(
+        return Iterators.singleOrNull(cypher.query(
                 "MATCH (movie:Movie {title:{title}})" +
                 " OPTIONAL MATCH (movie)<-[r]-(person:Person)\n" +
                 " RETURN movie.title as title, collect({name:person.name, job:head(split(lower(type(r)),'_')), role:r.roles}) as cast LIMIT 1",
@@ -47,7 +47,7 @@ public class MovieService {
     @SuppressWarnings("unchecked")
     public Iterable<Map<String,Object>> search(String query) {
         if (query==null || query.trim().isEmpty()) return Collections.emptyList();
-        return IteratorUtil.asCollection(cypher.query(
+        return Iterators.asCollection(cypher.query(
                 "MATCH (movie:Movie)\n" +
                 " WHERE lower(movie.title) CONTAINS {part}\n" +
                 " RETURN movie",

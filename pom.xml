@@ -9,7 +9,7 @@
     <description>Neo4j Movies Demo App</description>
     <url>http://github.com/neo4j-examples/neo4j-movies-java-bolt</url>
     <properties>
-        <neo4j.version>3.0.0-RC1</neo4j.version>
+        <neo4j.version>3.0.1</neo4j.version>
     </properties>
 
     <dependencies>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>org.neo4j.driver</groupId>
             <artifactId>neo4j-java-driver</artifactId>
-            <version>1.0.0-RC2</version>
+            <version>1.0.1</version>
         </dependency>
 <!-- end::bolt-dependency[] -->
         <dependency>
