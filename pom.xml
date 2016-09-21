@@ -51,6 +51,19 @@
             <version>1.8.4</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.21</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.7</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -79,7 +92,7 @@
                             <extraJvmArguments>-Xmx512m</extraJvmArguments>
                             <programs>
                                 <program>
-                                    <mainClass>example.jdbc.movies.MovieServer</mainClass>
+                                    <mainClass>example.movies.backend.MovieServer</mainClass>
                                     <name>webapp</name>
                                 </program>
                             </programs>
@@ -99,7 +112,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>example.jdbc.movies.MovieServer</mainClass>
+                    <mainClass>example.movies.backend.MovieServer</mainClass>
                 </configuration>
             </plugin>
         </plugins>
