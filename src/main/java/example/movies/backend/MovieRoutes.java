@@ -21,21 +21,11 @@ public class MovieRoutes implements SparkApplication {
     }
 
     public void init() {
-        get(new Route("/movie/:title") {
-            public Object handle(Request request, Response response) {
-                return gson.toJson(service.findMovie(URLDecoder.decode(request.params("title"))));
-            }
-        });
-        get(new Route("/search") {
-            public Object handle(Request request, Response response) {
-                return gson.toJson(service.search(request.queryParams("q")));
-            }
-        });
-        get(new Route("/graph") {
-            public Object handle(Request request, Response response) {
-                int limit = request.queryParams("limit") != null ? Integer.valueOf(request.queryParams("limit")) : 100;
-                return gson.toJson(service.graph(limit));
-            }
+        get("/movie/:title", (req, res) -> gson.toJson(service.findMovie(URLDecoder.decode(req.params("title")))));
+        get("/search", (req, res) -> gson.toJson(service.search(req.queryParams("q"))));
+        get("/graph", (req, res) -> {
+            int limit = req.queryParams("limit") != null ? Integer.valueOf(req.queryParams("limit")) : 100;
+            return gson.toJson(service.graph(limit));
         });
     }
 }
