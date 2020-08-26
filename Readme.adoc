@@ -9,7 +9,11 @@ It is a very simple web application that uses our Movie graph dataset to provide
 THe front-end is just jQuery and d3 and the backend is implemented in Java using spark-java a lightweight web framework.
 
 Using Neo4j from Java is as easy as using any other database that offers a textual query language.
-With our binary protocol driver for the binary protocol, you get a clean API to manage your `Session`, `Transaction` and `Statement` and iterate over each `Value` of a `StatementResult` with a rich conversion DSL.
+With our binary protocol driver for the binary protocol, you get a clean API to manage your `Session`, `Transaction` and `Statement` and iterate over each `Value` of a `Result` with a rich conversion DSL.
+
+We can select a database of a server to run against.
+
+NOTE: The credentials and database are passed as part of the URL which is NOT an official feature but just handled within this app.
 
 === The Stack
 
@@ -17,8 +21,8 @@ These are the components of our min- Web Application:
 
 * Application Type:         Java-Web Application
 * Web framework:            http://www.sparkjava.com/[Spark-Java] (Micro-Webframework)
-* Neo4j Database Connector: https://github.com/neo4j/neo4j-java-driver[Neo4j-Java-Driver] for Cypher http://neo4j.com/docs/developer-manual/current/#driver-manual-index[Docs]
-* Database:                 Neo4j-Server
+* Neo4j Database Connector: https://github.com/neo4j/neo4j-java-driver[Neo4j-Java-Driver] for Cypher http://neo4j.com/developer/java[Docs]
+* Database:                 Neo4j-Server (4.x) with multi-database
 * Frontend:                 jquery, bootstrap, http://d3js.org/[d3.js]
 
 === Endpoints:
@@ -39,8 +43,7 @@ curl http://localhost:8080/graph
 === Setup
 
 Spark is a micro-webframework to easily define routes for endpoints and provide their implementation.
-In our case the implementation calls the `MovieService` which has one method per endpoint that returns Java collections
-which are turned into JSON using the Google Gson library.
+In our case the implementation calls the `MovieService` which has one method per endpoint that returns Java collections which are turned into JSON using the Google Gson library.
 
 The `MovieService` uses the Neo4j-Java driver to execute queries via Neo4j binary protocol "Bolt".
 You add the dependency to the Neo4j-Java-Driver driver in your `pom.xml`:
@@ -50,7 +53,7 @@ You add the dependency to the Neo4j-Java-Driver driver in your `pom.xml`:
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>1.0.0-RC2</version>
+    <version>4.1.1</version>
 </dependency>
 ----
 
@@ -63,29 +66,37 @@ With your statement you can provide parameters as a Java map.
 [source,java]
 ----
 Driver driver = GraphDatabase.driver("bolt://localhost");
-String query = "MATCH (:Movie {title:{title}})<-[:ACTED_IN]-(a:Person) RETURN a.name as actor";
+String query = "MATCH (:Movie {title:$title})<-[:ACTED_IN]-(a:Person) RETURN a.name as actor";
 
 try (Session session = driver.session()) {
-
-    StatementResult result = session.run(query, singletonMap("title", "The Matrix"));
+    Result result = session.run(query, singletonMap("title", "The Matrix"));
     while (result.hasNext()) {
         System.out.println(result.next().get("actor"));
     }
 }
 ----
 
-=== Run locally:
+=== Run locally
 
-Start your local Neo4j Server (http://neo4j.com/download[Download & Install]), open the http://localhost:7474[Neo4j Browser].
+With our online demo server you can test this application:
+
+[source,shell]
+----
+NEO4J_URL=neo4j+s://movies:movies@demo.neo4jlabs.com/movies mvn compile exec:java
+----
+
+Go to http://localhost:8080
+
+You can search for movies by title or and click on any entry.
+
+Or better you can run Neo4j locally to experiment with your own data.
+Start your local Neo4j Server in Neo4j Desktop (http://neo4j.com/download[Download & Install]), open Neo4j Browser.
 After logging in, install the Movies graph data set by entering the `:play movies` command, click the CREATE-statement, and hit the triangular "Run" button.
 
 Start this application with:
 
 [source,shell]
 ----
-mvn compile exec:java
+# with a local neo4j instance
+NEO4J_URL=bolt://neo4j:s3cr3t@localhost mvn compile exec:java
 ----
-
-Go to http://localhost:8080
-
-You can search for movies by title or and click on any entry.

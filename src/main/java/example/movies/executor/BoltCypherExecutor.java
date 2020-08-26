@@ -1,8 +1,7 @@
 package example.movies.executor;
 
-import org.neo4j.driver.v1.*;
+import org.neo4j.driver.*;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -11,25 +10,32 @@ import java.util.Map;
  */
 public class BoltCypherExecutor implements CypherExecutor {
 
-    private final org.neo4j.driver.v1.Driver driver;
+    private final org.neo4j.driver.Driver driver;
+    private final String database;
 
     public BoltCypherExecutor(String url) {
-        this(url, null, null);
+        this(url, null, null, null);
     }
 
-    public BoltCypherExecutor(String url, String username, String password) {
+    public BoltCypherExecutor(String url, String username, String password, String database) {
         boolean hasPassword = password != null && !password.isEmpty();
         AuthToken token = hasPassword ? AuthTokens.basic(username, password) : AuthTokens.none();
-        driver = GraphDatabase.driver(url, token, Config.build().withEncryptionLevel(Config.EncryptionLevel.NONE).toConfig());
+        driver = GraphDatabase.driver(url, token);
+        this.database = database;
     }
 
     @Override
-    public Iterator<Map<String, Object>> query(String query, Map<String, Object> params) {
-        try (Session session = driver.session()) {
-            List<Map<String, Object>> list = session.run(query, params)
-                    .list( r -> r.asMap(BoltCypherExecutor::convert));
-            return list.iterator();
+    public List<Map<String, Object>> query(String query, Map<String, Object> params) {
+        try (Session session = getSession()) {
+            return session.readTransaction(
+               tx -> tx.run(query, params).list( r -> r.asMap(BoltCypherExecutor::convert))
+            );
         }
+    }
+
+    private Session getSession() {
+        if (database == null || database.isBlank()) return driver.session();
+        return driver.session(SessionConfig.forDatabase(database));
     }
 
     static Object convert(Value value) {
