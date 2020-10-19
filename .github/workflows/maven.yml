@@ -58,10 +58,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: cypress-io/github-action@v2
         env:
-          NEO4J_HOST: localhost
-          NEO4J_DATABASE: ""
+          NEO4J_URI: bolt://localhost
+          NEO4J_DATABASE: "neo4j"
           NEO4J_USER: neo4j
-          NEO4J_PASS: abcde
+          NEO4J_PASSWORD: abcde
         with:
           start: mvn package -DskipTests exec:java
           browser: chrome
