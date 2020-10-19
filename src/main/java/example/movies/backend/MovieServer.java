@@ -1,6 +1,9 @@
 package example.movies.backend;
 
 import example.movies.Environment;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
 import spark.Spark;
 
 import static spark.Spark.externalStaticFileLocation;
@@ -13,12 +16,13 @@ public class MovieServer {
     public static void main(String[] args) {
         Spark.port(Environment.getPort());
         externalStaticFileLocation("src/main/webapp");
-        MovieService service = new MovieService(
+        var driver = GraphDatabase.driver(
                 Environment.getNeo4jUrl(),
-                Environment.getNeo4jUsername(),
-                Environment.getNeo4jPassword(),
-                Environment.getNeo4jDatabase()
+                AuthTokens.basic(Environment.getNeo4jUsername(), Environment.getNeo4jPassword())
         );
+        var service = new MovieService(driver, Environment.getNeo4jDatabase());
         new MovieRoutes(service).init();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(driver::close));
     }
 }

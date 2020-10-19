@@ -1,8 +1,15 @@
 package example.movies.backend;
 
-import example.movies.executor.CypherExecutor;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.Value;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author mh
@@ -10,19 +17,18 @@ import java.util.*;
  */
 public class MovieService {
 
-    private final CypherExecutor cypher;
+    private final Driver driver;
 
-    public MovieService(String url, String username, String password, String database) {
-        cypher = createCypherExecutor(url, username, password, database);
-    }
+    private final String database;
 
-    private CypherExecutor createCypherExecutor(String url, String username, String password, String database) {
-        return new CypherExecutor(url, username, password, database);
+    public MovieService(Driver driver, String database) {
+        this.driver = driver;
+        this.database = database;
     }
 
     public Map<String, Object> findMovie(String title) {
         if (title == null) return Map.of();
-        var result = cypher.query(
+        var result = query(
                 "MATCH (movie:Movie {title:$title})" +
                         " OPTIONAL MATCH (movie)<-[r]-(person:Person)\n" +
                         " RETURN movie.title as title, collect({name:person.name, job:head(split(toLower(type(r)),'_')), role:r.roles}) as cast LIMIT 1",
@@ -32,7 +38,7 @@ public class MovieService {
 
     public Iterable<Map<String, Object>> search(String query) {
         if (query == null || query.trim().isEmpty()) return Collections.emptyList();
-        return cypher.query(
+        return query(
                 "MATCH (movie:Movie)\n" +
                         " WHERE toLower(movie.title) CONTAINS $part\n" +
                         " RETURN movie",
@@ -40,7 +46,7 @@ public class MovieService {
     }
 
     public Map<String, Object> graph(int limit) {
-        var result = cypher.query(
+        var result = query(
                 "MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) " +
                         " RETURN m.title as movie, collect(a.name) as cast " +
                         " LIMIT $limit", Map.of("limit", limit));
@@ -63,5 +69,29 @@ public class MovieService {
             }
         }
         return Map.of("nodes", nodes, "links", rels);
+    }
+
+    private List<Map<String, Object>> query(String query, Map<String, Object> params) {
+        try (Session session = getSession()) {
+            return session.readTransaction(
+                    tx -> tx.run(query, params).list( r -> r.asMap(MovieService::convert))
+            );
+        }
+    }
+
+    private Session getSession() {
+        if (database == null || database.isBlank()) return driver.session();
+        return driver.session(SessionConfig.forDatabase(database));
+    }
+
+    private static Object convert(Value value) {
+        switch (value.type().name()) {
+            case "PATH":
+                return value.asList(MovieService::convert);
+            case "NODE":
+            case "RELATIONSHIP":
+                return value.asMap();
+        }
+        return value.asObject();
     }
 }
