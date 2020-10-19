@@ -1,5 +1,7 @@
 == Neo4j Movies Example Application
 
+image::https://github.com/neo4j-examples/neo4j-movies-java-bolt/workflows/Java%20CI%20with%20Maven/badge.svg[CI]
+
 image::http://dev.assets.neo4j.com.s3.amazonaws.com/wp-content/uploads/movie_application.png[float=right,width=400]
 
 This example application demonstrates how easy it is to get started with http://neo4j.com/developer[Neo4j] in Java.
