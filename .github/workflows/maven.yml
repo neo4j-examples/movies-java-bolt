@@ -20,6 +20,13 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Cache local Maven repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
     - name: Build with Maven
       run: mvn --show-version --batch-mode package --file pom.xml
 
@@ -51,6 +58,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Download dataset
         run: curl --output /tmp/movies.cypher https://raw.githubusercontent.com/neo4j-graph-examples/movies/master/scripts/import.cypher
       - name: Import dataset
