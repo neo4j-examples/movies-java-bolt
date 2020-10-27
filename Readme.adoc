@@ -106,7 +106,7 @@ After logging in, install the Movies graph data set by entering the `:play movie
 |8080
 
 |NEO4J_URI
-|demo.neo4jlabs.com
+|neo4j+s://demo.neo4jlabs.com
 
 |NEO4J_USER
 |movies
