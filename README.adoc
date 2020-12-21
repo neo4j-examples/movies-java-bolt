@@ -8,13 +8,6 @@ This example application demonstrates how easy it is to get started with https:/
 
 It is a very simple web application that uses our Movie graph dataset to provide a search with listing, a detail view and a graph visualization.
 
-The front-end is just jQuery and d3 and the backend is implemented in Java using spark-java a lightweight web framework.
-
-Using Neo4j from Java is as easy as using any other database that offers a textual query language.
-With our binary protocol driver for the binary protocol, you get a clean API to manage your `Session`, `Transaction` and `Statement` and iterate over each `Value` of a `Result` with a rich conversion DSL.
-
-We can select a database of a server to run against.
-
 === The Stack
 
 These are the components of our Web Application:
@@ -44,42 +37,11 @@ curl http://localhost:8080/graph
 
 === Setup
 
-Spark is a micro-webframework to easily define routes for endpoints and provide their implementation.
-In our case the implementation calls the `MovieService` which has one method per endpoint that returns Java collections which are turned into JSON using the Google Gson library.
-
-The `MovieService` uses the Neo4j-Java driver to execute queries via Neo4j binary protocol "Bolt".
-You add the dependency to the Neo4j-Java-Driver driver in your `pom.xml`:
-
-[source,xml]
-----
-<dependency>
-    <groupId>org.neo4j.driver</groupId>
-    <artifactId>neo4j-java-driver</artifactId>
-    <version>4.2.0</version>
-</dependency>
-----
-
-To use the driver, you provide a connection URL, e.g. `localhost`, and credentials, get a `Driver` instance, from which you get a Session.
-The session allows you to execute Cypher statements directly and iterate over the `StatementResults` to access the resulting `Value`s.
-
-With your statement you can provide parameters as a Java map.
-
-[source,java]
-----
-Driver driver = GraphDatabase.driver("bolt://localhost");
-String query = "MATCH (:Movie {title:$title})<-[:ACTED_IN]-(a:Person) RETURN a.name as actor";
-
-try (Session session = driver.session()) {
-    Result result = session.readTransaction((tx) -> tx.run(query, Map.of("title", "The Matrix")));
-    while (result.hasNext()) {
-        System.out.println(result.next().get("actor"));
-    }
-}
-----
+Make sure to install a https://jdk.java.net/[JDK 11+] and https://maven.apache.org/download.cgi[Apache Maven].
 
 === Run locally
 
-With our online demo server you can test this application:
+Just run:
 
 [source,shell]
 ----
