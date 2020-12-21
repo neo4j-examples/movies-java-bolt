@@ -74,7 +74,7 @@ public class MovieService {
     private List<Map<String, Object>> query(String query, Map<String, Object> params) {
         try (Session session = getSession()) {
             return session.readTransaction(
-                    tx -> tx.run(query, params).list( r -> r.asMap(MovieService::convert))
+                    tx -> tx.run(query, params).list(r -> r.asMap(MovieService::convert))
             );
         }
     }

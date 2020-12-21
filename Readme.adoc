@@ -1,4 +1,4 @@
-== Neo4j Movies Example Application
+== Neo4j Movies Application: Quick Start
 
 image::https://github.com/neo4j-examples/neo4j-movies-java-bolt/workflows/Java%20CI%20with%20Maven/badge.svg[CI]
 
@@ -8,7 +8,7 @@ This example application demonstrates how easy it is to get started with http://
 
 It is a very simple web application that uses our Movie graph dataset to provide a search with listing, a detail view and a graph visualization.
 
-THe front-end is just jQuery and d3 and the backend is implemented in Java using spark-java a lightweight web framework.
+The front-end is just jQuery and d3 and the backend is implemented in Java using spark-java a lightweight web framework.
 
 Using Neo4j from Java is as easy as using any other database that offers a textual query language.
 With our binary protocol driver for the binary protocol, you get a clean API to manage your `Session`, `Transaction` and `Statement` and iterate over each `Value` of a `Result` with a rich conversion DSL.
@@ -19,13 +19,15 @@ NOTE: The credentials and database are passed as part of the URL which is NOT an
 
 === The Stack
 
-These are the components of our min- Web Application:
+These are the components of our Web Application:
 
 * Application Type:         Java-Web Application
 * Web framework:            http://www.sparkjava.com/[Spark-Java] (Micro-Webframework)
 * Neo4j Database Connector: https://github.com/neo4j/neo4j-java-driver[Neo4j-Java-Driver] for Cypher http://neo4j.com/developer/java[Docs]
 * Database:                 Neo4j-Server (4.x) with multi-database
 * Frontend:                 jquery, bootstrap, http://d3js.org/[d3.js]
+
+Provision a database quickly with https://sandbox.neo4j.com/[Neo4j Sandbox] or https://neo4j.com/cloud/aura/[Neo4j Aura].
 
 === Endpoints:
 
@@ -55,7 +57,7 @@ You add the dependency to the Neo4j-Java-Driver driver in your `pom.xml`:
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>4.1.1</version>
+    <version>4.2.0</version>
 </dependency>
 ----
 
@@ -70,7 +72,7 @@ Driver driver = GraphDatabase.driver("bolt://localhost");
 String query = "MATCH (:Movie {title:$title})<-[:ACTED_IN]-(a:Person) RETURN a.name as actor";
 
 try (Session session = driver.session()) {
-    Result result = session.run(query, singletonMap("title", "The Matrix"));
+    Result result = session.readTransaction((tx) -> tx.run(query, Map.of("title", "The Matrix")));
     while (result.hasNext()) {
         System.out.println(result.next().get("actor"));
     }
