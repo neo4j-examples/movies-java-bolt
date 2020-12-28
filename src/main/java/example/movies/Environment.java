@@ -30,11 +30,15 @@ public class Environment {
     }
 
     public static String getNeo4jDatabase() {
-        String database = System.getenv("NEO4J_DATABASE");
-        if (database == null || database.isEmpty()) {
-            return DEFAULT_DATABASE;
+        String neo4jVersion = System.getenv("NEO4J_VERSION");
+        if (neo4jVersion == null || neo4jVersion.startsWith("4")) {
+            String database = System.getenv("NEO4J_DATABASE");
+            if (database == null || database.isEmpty()) {
+                return DEFAULT_DATABASE;
+            }
+            return database;
         }
-        return database;
+        return null;
     }
 
     public static String getNeo4jUsername() {
