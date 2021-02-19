@@ -5,10 +5,5 @@ target
 .classpath
 .project
 .settings
-
-target
-*.iml
 *.class
 *.jar
-*.pyc
-/node_modules
