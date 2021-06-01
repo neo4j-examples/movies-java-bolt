@@ -1,9 +1,11 @@
 package example.movies.backend;
 
 import org.neo4j.driver.Driver;
+import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.SessionConfig;
 import org.neo4j.driver.Value;
+import org.neo4j.driver.summary.ResultSummary;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +36,20 @@ public class MovieService {
                         " RETURN movie.title as title, collect({name:person.name, job:head(split(toLower(type(r)),'_')), role:r.roles}) as cast LIMIT 1",
                 Map.of("title", title));
         return result.isEmpty() ? Map.of() : result.get(0);
+    }
+
+    public Integer voteInMovie(String title) {
+        if (title == null) return 0;
+        try (Session session = getSession()) {
+            return session.writeTransaction( tx -> {
+                Result result = tx.run(
+                        "MATCH (m:Movie {title: $title}) " +
+                        "WITH m, (CASE WHEN exists(m.votes) THEN m.votes ELSE 0 END) AS currentVotes " +
+                        "SET m.votes = currentVotes + 1;", Map.of("title", title) );
+                ResultSummary summary = result.consume();
+                return summary.counters().propertiesSet();
+            } );
+        }
     }
 
     public Iterable<Map<String, Object>> search(String query) {

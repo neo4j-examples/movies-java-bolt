@@ -9,8 +9,10 @@ import spark.servlet.SparkApplication;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static spark.Spark.get;
+import static spark.Spark.post;
 
 public class MovieRoutes implements SparkApplication {
 
@@ -24,6 +26,10 @@ public class MovieRoutes implements SparkApplication {
 
     public void init() {
         get("/movie/:title", (req, res) -> gson.toJson(service.findMovie(URLDecoder.decode(req.params("title"), StandardCharsets.UTF_8))));
+        post("/movie/:title/vote", (req, res) -> {
+            Integer updates = service.voteInMovie(URLDecoder.decode(req.params("title"), StandardCharsets.UTF_8));
+            return gson.toJson( Map.of("updated", updates));
+        });
         get("/search", (req, res) -> gson.toJson(service.search(req.queryParams("q"))));
         get("/graph", (req, res) -> {
             int limit = req.queryParams("limit") != null ? Integer.parseInt(req.queryParams("limit")) : 100;
