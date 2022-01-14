@@ -26,7 +26,7 @@ public class MovieRoutes implements SparkApplication {
 
     public void init() {
         get("/movie/:title", (req, res) -> gson.toJson(service.findMovie(URLDecoder.decode(req.params("title"), StandardCharsets.UTF_8))));
-        post("/movie/:title/vote", (req, res) -> {
+        post("/movie/vote/:title", (req, res) -> {
             Integer updates = service.voteInMovie(URLDecoder.decode(req.params("title"), StandardCharsets.UTF_8));
             return gson.toJson( Map.of("updated", updates));
         });

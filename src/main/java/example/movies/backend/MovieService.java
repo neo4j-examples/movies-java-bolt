@@ -44,8 +44,7 @@ public class MovieService {
             return session.writeTransaction( tx -> {
                 Result result = tx.run(
                         "MATCH (m:Movie {title: $title}) " +
-                        "WITH m, (CASE WHEN exists(m.votes) THEN m.votes ELSE 0 END) AS currentVotes " +
-                        "SET m.votes = currentVotes + 1;", Map.of("title", title) );
+                        "SET m.votes = COALESCE(m.votes, 0) + 1;", Map.of("title", title) );
                 ResultSummary summary = result.consume();
                 return summary.counters().propertiesSet();
             } );
@@ -56,9 +55,9 @@ public class MovieService {
         if (query == null || query.trim().isEmpty()) return Collections.emptyList();
         return query(
                 "MATCH (movie:Movie)\n" +
-                        " WHERE toLower(movie.title) CONTAINS $part\n" +
+                        " WHERE toLower(movie.title) CONTAINS toLower($part)\n" +
                         " RETURN movie",
-                Map.of("part", query.toLowerCase()));
+                Map.of("part", query));
     }
 
     public Map<String, Object> graph(int limit) {
