@@ -2,9 +2,11 @@ name: Java
 
 on:
   push:
-    branches: [ '**' ]
+    branches: [ 'main' ]
   pull_request:
     branches: [ '**' ]
+  repository_dispatch:
+    types: [ 'movie-harness-change' ]
 
 jobs:
   build:
@@ -33,8 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 10.x ]
-        neo4j-version: [ "3.5", "3.5-enterprise", "4.2", "4.2-enterprise" ]
+        node-version: [ 16.x ]
+        neo4j-version: [ "3.5", "3.5-enterprise", "4.4", "4.4-enterprise" ]
     services:
       neo4j:
         image: neo4j:${{ matrix.neo4j-version }}
@@ -72,21 +74,24 @@ jobs:
         run: docker exec --interactive neo4j-e2e cypher-shell -u neo4j -p abcde --file /movies/movies.cypher
       - name: Check out project sources
         uses: actions/checkout@v2
-      - name: Start server
-        env:
-          NEO4J_VERSION: ${{ matrix.neo4j-version }}
-          NEO4J_URI: bolt://localhost
-          NEO4J_DATABASE: "neo4j"
-          NEO4J_USER: neo4j
-          NEO4J_PASSWORD: abcde
-        run: mvn package -DskipTests exec:java &
+      - name: Create application binary
+        run: mvn --batch-mode package -DskipTests
       - name: Check out test harness sources
         uses: actions/checkout@v2
         with:
           repository: neo4j-examples/movies-harness
           path: e2e
       - uses: cypress-io/github-action@v2
+        env:
+          NEO4J_VERSION: ${{ matrix.neo4j-version }}
+          NEO4J_URI: bolt://localhost
+          NEO4J_DATABASE: "neo4j"
+          NEO4J_USER: neo4j
+          NEO4J_PASSWORD: abcde
+          DEBUG: '@cypress/github-action'
         with:
           working-directory: e2e
           browser: chrome
           headless: true
+          # sh is needed because of https://github.com/cypress-io/github-action/issues/482
+          start: sh ../target/bin/webapp

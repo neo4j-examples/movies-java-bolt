@@ -74,7 +74,7 @@
                             <programs>
                                 <program>
                                     <mainClass>example.movies.backend.MovieServer</mainClass>
-                                    <name>webapp</name>
+                                    <id>webapp</id>
                                 </program>
                             </programs>
                         </configuration>
