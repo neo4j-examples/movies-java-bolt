@@ -1,6 +1,6 @@
 == Neo4j Movies Application: Quick Start
 
-image::https://github.com/neo4j-examples/movies-java-bolt/workflows/Java%20CI%20with%20Maven/badge.svg[CI]
+image::https://github.com/neo4j-examples/movies-java-bolt/actions/workflows/maven.yml/badge.svg[CI]
 
 image::http://dev.assets.neo4j.com.s3.amazonaws.com/wp-content/uploads/movie_application.png[float=right,width=400]
 
