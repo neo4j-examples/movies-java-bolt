@@ -35,9 +35,9 @@ public class MovieService {
         if (title == null) return Map.of();
         var result = query(
                 """
-                        MATCH (movie:Movie {title:$title})
-                        OPTIONAL MATCH (movie)<-[r]-(person:Person)
-                        RETURN movie.title as title, collect({name:person.name, job:head(split(toLower(type(r)),'_')), role:r.roles}) as cast LIMIT 1""",
+                  MATCH (movie:Movie {title:$title})
+                  OPTIONAL MATCH (movie)<-[r]-(person:Person)
+                  RETURN movie.title as title, collect({name:person.name, job:head(split(toLower(type(r)),'_')), role:r.roles}) as cast LIMIT 1""",
                 Map.of("title", title));
         return result.isEmpty() ? Map.of() : result.get(0);
     }
@@ -58,18 +58,18 @@ public class MovieService {
         if (query == null || query.trim().isEmpty()) return Collections.emptyList();
         return query(
                 """
-                        MATCH (movie:Movie)
-                        WHERE toLower(movie.title) CONTAINS toLower($part)
-                        RETURN movie""",
+                  MATCH (movie:Movie)
+                  WHERE toLower(movie.title) CONTAINS toLower($part)
+                  RETURN movie""",
                 Map.of("part", query));
     }
 
     public Map<String, Object> graph(int limit) {
         var result = query(
                 """
-                        MATCH (m:Movie)<-[:ACTED_IN]-(a:Person)
-                        RETURN m.title as movie, collect(a.name) as cast
-                        LIMIT $limit""",
+                  MATCH (m:Movie)<-[:ACTED_IN]-(a:Person)
+                  RETURN m.title as movie, collect(a.name) as cast
+                  LIMIT $limit""",
                 Map.of("limit", limit));
 
         var nodes = new ArrayList<Map<String, Object>>();
