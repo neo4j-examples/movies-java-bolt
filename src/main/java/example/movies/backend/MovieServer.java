@@ -1,11 +1,11 @@
 package example.movies.backend;
 
+import static spark.Spark.staticFileLocation;
+
 import example.movies.Environment;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import spark.Spark;
-
-import static spark.Spark.staticFileLocation;
 
 /**
  * @author Michael Hunger @since 22.10.13
@@ -17,8 +17,7 @@ public class MovieServer {
         staticFileLocation("/public");
         var driver = GraphDatabase.driver(
                 Environment.getNeo4jUrl(),
-                AuthTokens.basic(Environment.getNeo4jUsername(), Environment.getNeo4jPassword())
-        );
+                AuthTokens.basic(Environment.getNeo4jUsername(), Environment.getNeo4jPassword()));
         var service = new MovieService(driver, Environment.getNeo4jDatabase());
         new MovieRoutes(service).init();
 
