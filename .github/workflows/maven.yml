@@ -79,7 +79,7 @@ jobs:
         with:
           repository: neo4j-examples/movies-harness
           path: e2e
-      - uses: cypress-io/github-action@v5
+      - uses: cypress-io/github-action@v6
         env:
           NEO4J_VERSION: ${{ matrix.neo4j-version }}
           NEO4J_URI: bolt://localhost
