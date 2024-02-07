@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -71,11 +71,11 @@ jobs:
       - name: Import dataset
         run: docker exec --interactive neo4j-e2e cypher-shell -u neo4j -p neo4jpass --file /movies/movies.cypher
       - name: Check out project sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Create application binary
         run: mvn --batch-mode package -DskipTests
       - name: Check out test harness sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: neo4j-examples/movies-harness
           path: e2e
